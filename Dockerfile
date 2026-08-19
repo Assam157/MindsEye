@@ -1,9 +1,11 @@
-FROM python:3.10
+ FROM python:3.10
 
-# Install all required OpenGL/EGL libraries
+# Install all OpenGL, EGL, GLES, and other system libraries
 RUN apt-get update && apt-get install -y \
     libgl1 \
+    libgl1-mesa-glx \
     libegl1 \
+    libgles2 \
     libopengl0 \
     libglib2.0-0 \
     libsm6 \
@@ -17,7 +19,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-# Disable GPU and OpenCL to prevent further library lookups
+# Disable GPU acceleration and OpenCL
 ENV OPENCV_OPENCL_RUNTIME=
 ENV MEDIAPIPE_DISABLE_GPU=1
 
