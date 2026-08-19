@@ -1,4 +1,4 @@
- from flask import Flask, render_template
+from flask import Flask, render_template
 from flask_socketio import SocketIO
 import cv2
 import mediapipe as mp
