@@ -1,7 +1,7 @@
 # requirements.txt
 Flask
 flask-socketio
-opencv-python
+opencv-python-headless
 mediapipe
 numpy
 gunicorn
