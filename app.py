@@ -1,24 +1,42 @@
-import os
+ import os
+import urllib.request
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 import cv2
 import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 import math
 import time
+
+# Force CPU mode (no GPU libraries needed)
+os.environ['MEDIAPIPE_DISABLE_GPU'] = '1'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# ---------- Use mp.solutions (CPU only) ----------
-mp_face = mp.solutions.face_mesh
-face_mesh = mp_face.FaceMesh(
-    static_image_mode=False,
-    max_num_faces=1,
-    refine_landmarks=True,
-    min_detection_confidence=0.5,
+# ---------- Download the face landmarker model if not present ----------
+MODEL_PATH = "face_landmarker.task"
+if not os.path.exists(MODEL_PATH):
+    print("📥 Downloading face landmarker model...")
+    urllib.request.urlretrieve(
+        "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task",
+        MODEL_PATH
+    )
+    print("✅ Download complete.")
+
+# ---------- Create the landmarker ----------
+base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
+options = vision.FaceLandmarkerOptions(
+    base_options=base_options,
+    output_face_blendshapes=False,
+    output_facial_transformation_matrixes=False,
+    num_faces=1,
+    min_face_detection_confidence=0.5,
     min_tracking_confidence=0.5
 )
+detector = vision.FaceLandmarker.create_from_options(options)
 
 # Landmark indices
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
@@ -73,10 +91,11 @@ def emit_loop():
         frame_count += 1
         frame = cv2.flip(frame, 1)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = face_mesh.process(rgb)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        detection_result = detector.detect(mp_image)
 
-        if results.multi_face_landmarks:
-            landmarks = results.multi_face_landmarks[0].landmark
+        if detection_result.face_landmarks:
+            landmarks = detection_result.face_landmarks[0]
 
             ear_left = aspect_ratio(landmarks, LEFT_EYE)
             ear_right = aspect_ratio(landmarks, RIGHT_EYE)
