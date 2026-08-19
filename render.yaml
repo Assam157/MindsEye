@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: minds-eye
+    runtime: python
+    buildCommand: |
+      apt-get update
+      apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 libgles2-mesa
+      pip install -r requirements.txt
+    startCommand: gunicorn -w 1 --threads 100 app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
