@@ -1,9 +1,8 @@
  FROM python:3.10
 
-# Install all OpenGL, EGL, GLES, and other system libraries
+# Install all required OpenGL/EGL/GLES libraries (no libgl1-mesa-glx)
 RUN apt-get update && apt-get install -y \
     libgl1 \
-    libgl1-mesa-glx \
     libegl1 \
     libgles2 \
     libopengl0 \
@@ -19,7 +18,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-# Disable GPU acceleration and OpenCL
 ENV OPENCV_OPENCL_RUNTIME=
 ENV MEDIAPIPE_DISABLE_GPU=1
 
