@@ -1,22 +1,18 @@
 FROM python:3.10-slim
 
-# Install system libraries needed by MediaPipe and OpenCV
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libgles2-mesa && \
-    rm -rf /var/lib/apt/lists/*
+    libgles2 \                    # <-- changed from libgles2-mesa
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
 
 CMD ["gunicorn", "-w", "1", "--threads", "100", "--bind", "0.0.0.0:5000", "app:app"]
