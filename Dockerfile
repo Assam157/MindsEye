@@ -1,13 +1,24 @@
- FROM python:3.10
+FROM python:3.10
 
-# Install the missing OpenGL library (correct package in Debian)
-RUN apt-get update && apt-get install -y libgl1 && rm -rf /var/lib/apt/lists/*
+# Install all required OpenGL/EGL libraries
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libegl1 \
+    libopengl0 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
+# Disable GPU and OpenCL to prevent further library lookups
 ENV OPENCV_OPENCL_RUNTIME=
+ENV MEDIAPIPE_DISABLE_GPU=1
 
 CMD ["gunicorn", "-w", "1", "--threads", "100", "--bind", "0.0.0.0:5000", "app:app"]
