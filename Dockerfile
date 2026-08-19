@@ -1,14 +1,4 @@
-FROM python:3.10-slim
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    libgles2 \                    # <-- changed from libgles2-mesa
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.10
 
 WORKDIR /app
 COPY requirements.txt .
