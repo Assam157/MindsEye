@@ -1,0 +1,8 @@
+# requirements.txt
+Flask
+flask-socketio
+opencv-python
+mediapipe
+numpy
+gunicorn
+eventlet
