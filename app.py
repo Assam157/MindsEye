@@ -1,4 +1,5 @@
 import os
+os.environ['MEDIAPIPE_DISABLE_GPU'] = '1'
 import urllib.request
 from flask import Flask, render_template
 from flask_socketio import SocketIO
