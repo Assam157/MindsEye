@@ -1,7 +1,7 @@
 Flask
 flask-socketio
-opencv-python-headless    # <-- no GUI dependencies
-mediapipe==0.10.35# <-- last version with mp.solutions
+opencv-python-headless   
+mediapipe==0.10.35 
 numpy
 gunicorn
 python-engineio
