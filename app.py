@@ -1,3 +1,6 @@
+import os
+os.environ['MEDIAPIPE_DISABLE_GPU'] = '1'   # Force CPU-only mode
+os.environ['DISPLAY'] = ':0'       
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 import cv2
